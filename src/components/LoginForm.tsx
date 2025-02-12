@@ -1,45 +1,48 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { useRouter } from "next/router"
-import { useAuthStore } from "@/store/useStore"
+import type React from "react";
+import { useState } from "react";
+import { useRouter } from "next/router";
+import { useAuthStore } from "@/store/useStore";
 
 const LoginForm = () => {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const router = useRouter()
-  const setToken = useAuthStore((state) => state.setToken)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const setToken = useAuthStore((state) => state.setToken);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (response.ok) {
-        setToken(data.token)
-        router.push("/dashboard")
+        setToken(data.token);
+        router.push("/dashboard");
       } else {
-        setError(data.error || "Login failed")
+        setError(data.error || "Login failed");
       }
     } catch (err) {
-      setError("An error occurred. Please try again.")
+      setError("An error occurred. Please try again.");
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="email"
+          className="block text-sm font-medium text-gray-700"
+        >
           Email
         </label>
         <input
@@ -52,7 +55,10 @@ const LoginForm = () => {
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="password"
+          className="block text-sm font-medium text-gray-700"
+        >
           Password
         </label>
         <input
@@ -72,8 +78,7 @@ const LoginForm = () => {
         Log In
       </button>
     </form>
-  )
-}
+  );
+};
 
-export default LoginForm
-
+export default LoginForm;

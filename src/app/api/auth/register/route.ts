@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { eq } from "drizzle-orm";
+import * as jose from "jose";
 
 export async function POST(req: Request) {
   try {
     const { name, email, password } = await req.json();
-    console.log("Received registration request for:", email); // Add logging
+    console.log("Received registration request for:", email);
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -17,8 +17,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if user exists
-    console.log("Checking for existing user..."); // Add logging
     const existingUser = await db
       .select()
       .from(users)
@@ -31,12 +29,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // Hash password
-    console.log("Hashing password..."); // Add logging
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
-    console.log("Creating new user..."); // Add logging
     const newUser = await db
       .insert(users)
       .values({
@@ -46,17 +40,13 @@ export async function POST(req: Request) {
       })
       .returning();
 
-    console.log("User created:", newUser); // Add logging
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+    const token = await new jose.SignJWT({ userId: newUser[0].id })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("1d")
+      .sign(secret);
 
-    // Generate JWT token
-    console.log("Generating token..."); // Add logging
-    const token = jwt.sign(
-      { userId: newUser[0].id },
-      process.env.JWT_SECRET || "fallback-secret",
-      { expiresIn: "1d" }
-    );
-
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         user: { id: newUser[0].id, name, email },
         token,
@@ -64,8 +54,20 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
+
+    // Set cookie (same as login)
+    response.cookies.set({
+      name: "token",
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 86400, // 1 day
+    });
+
+    return response;
   } catch (error) {
-    // More detailed error logging
     console.error("Registration error details:", {
       message: error instanceof Error ? error.message : "Unknown error",
       stack: error instanceof Error ? error.stack : undefined,

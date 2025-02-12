@@ -14,24 +14,23 @@ export default function Dashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
   const [filterPriority, setFilterPriority] = useState("");
-  const token = useAuthStore((state) => state.token);
+  const { token, user } = useAuthStore();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    // Check if we have a token in cookies
-    const cookies = document.cookie.split(";");
-    const tokenCookie = cookies.find((cookie) =>
-      cookie.trim().startsWith("token=")
-    );
-    const tokenValue = tokenCookie?.split("=")?.[1];
+    const checkAuth = setTimeout(() => {
+      if (!token && !document.cookie.includes('token=')) {
+        router.replace("/login");
+      }
+      setIsCheckingAuth(false);
+    }, 100);
 
-    if (!tokenValue && !token) {
-      router.replace("/login");
-    }
+    return () => clearTimeout(checkAuth);
   }, [token, router]);
 
   const {
     data: tasks = [],
-    isLoading,
+    isLoading: isTasksLoading,
     error,
   } = useQuery<Task[], Error>({
     queryKey: ["tasks"],
@@ -57,7 +56,38 @@ export default function Dashboard() {
         : true)
   );
 
-  if (!token) {
+  // Show loading spinner while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-900">
+        <div className="text-white">
+          <svg
+            className="animate-spin h-8 w-8 mr-3"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+        </div>
+      </div>
+    );
+  }
+
+  // Only show login prompt if we're sure the user isn't authenticated
+  if (!isCheckingAuth && !token) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-900">
         <div className="text-center">
@@ -75,8 +105,21 @@ export default function Dashboard() {
     );
   }
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>An error occurred: {error.message}</div>;
+  if (isTasksLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-900">
+        <div className="text-white">Loading tasks...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-900">
+        <div className="text-white">An error occurred: {error.message}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">

@@ -60,19 +60,19 @@ const TaskForm: React.FC = () => {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Task title"
-        className="w-full p-2 mb-2 border rounded"
+        className="text-black w-full p-2 mb-2 border rounded"
         required
       />
       <textarea
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         placeholder="Task description"
-        className="w-full p-2 mb-2 border rounded"
+        className="text-black w-full p-2 mb-2 border rounded"
       />
       <select
         value={priority}
         onChange={(e) => setPriority(e.target.value)}
-        className="w-full p-2 mb-2 border rounded"
+        className="text-black w-full p-2 mb-2 border rounded"
       >
         <option value="1">Low</option>
         <option value="2">Medium</option>
@@ -82,7 +82,7 @@ const TaskForm: React.FC = () => {
         type="date"
         value={dueDate}
         onChange={(e) => setDueDate(e.target.value)}
-        className="w-full p-2 mb-2 border rounded"
+        className="text-black w-full p-2 mb-2 border rounded"
         required
       />
       <button
