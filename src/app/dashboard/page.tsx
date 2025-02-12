@@ -14,7 +14,7 @@ export default function Dashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
   const [filterPriority, setFilterPriority] = useState("");
-  const { token, user } = useAuthStore();
+  const { token } = useAuthStore();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {

@@ -1,46 +1,50 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { useRouter } from "next/router"
-import { useAuthStore } from "@/store/useStore"
+import type React from "react";
+import { useState } from "react";
+import { useRouter } from "next/router";
+import { useAuthStore } from "@/store/useStore";
 
 const SignupForm = () => {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const router = useRouter()
-  const setToken = useAuthStore((state) => state.setToken)
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const setToken = useAuthStore((state) => state.setToken);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (response.ok) {
-        setToken(data.token)
-        router.push("/dashboard")
+        setToken(data.token);
+        router.push("/dashboard");
       } else {
-        setError(data.error || "Signup failed")
+        setError(data.error || "Signup failed");
       }
     } catch (err) {
-      setError("An error occurred. Please try again.")
+      console.log(err);
+      setError("An error occurred. Please try again.");
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="name"
+          className="block text-sm font-medium text-gray-700"
+        >
           Name
         </label>
         <input
@@ -53,7 +57,10 @@ const SignupForm = () => {
         />
       </div>
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="email"
+          className="block text-sm font-medium text-gray-700"
+        >
           Email
         </label>
         <input
@@ -66,7 +73,10 @@ const SignupForm = () => {
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="password"
+          className="block text-sm font-medium text-gray-700"
+        >
           Password
         </label>
         <input
@@ -86,8 +96,7 @@ const SignupForm = () => {
         Sign Up
       </button>
     </form>
-  )
-}
+  );
+};
 
-export default SignupForm
-
+export default SignupForm;

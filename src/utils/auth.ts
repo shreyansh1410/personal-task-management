@@ -16,6 +16,7 @@ export const verifyToken = async (
     const { payload } = await jose.jwtVerify(token, secret);
     return (payload as CustomJWTPayload).userId;
   } catch (error) {
+    console.log(error);
     throw new Error("Invalid token");
   }
 };
