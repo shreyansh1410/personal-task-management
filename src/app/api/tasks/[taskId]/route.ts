@@ -15,15 +15,9 @@ interface TaskUpdate {
   dueDate?: Date;
 }
 
-type RouteContext = {
-  params: {
-    taskId: string;
-  };
-};
-
 export async function PATCH(
   req: NextRequest,
-  context: RouteContext
+  { params }: { params: Promise<{ taskId: string }> }
 ) {
   try {
     const authHeader = req.headers.get("Authorization");
@@ -36,7 +30,7 @@ export async function PATCH(
 
     const token = authHeader.split(" ")[1];
     const userId = await verifyToken(token);
-    const taskId = (await context.params).taskId;
+    const { taskId } = await params;
 
     if (!taskId) {
       return NextResponse.json(
@@ -100,7 +94,7 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  context: RouteContext
+  { params }: { params: Promise<{ taskId: string }> }
 ) {
   try {
     const authHeader = req.headers.get("Authorization");
@@ -113,7 +107,7 @@ export async function DELETE(
 
     const token = authHeader.split(" ")[1];
     const userId = await verifyToken(token);
-    const taskId = (await context.params).taskId;
+    const { taskId } = await params;
 
     if (!taskId) {
       return NextResponse.json(
