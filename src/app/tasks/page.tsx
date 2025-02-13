@@ -26,8 +26,6 @@ export default function Tasks() {
 
   const {
     data: tasks = [],
-    isLoading,
-    error,
   } = useQuery<Task[], Error>({
     queryKey: ["tasks"],
     queryFn: async () => {

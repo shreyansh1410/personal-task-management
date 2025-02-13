@@ -1,11 +1,23 @@
-// app/api/tasks/[taskId]/route.ts
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { tasks } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { verifyToken } from "@/utils/auth";
 
-export async function PATCH(req: Request, { params }: { params: { taskId: string } }) {
+interface TaskUpdate {
+  title?: string;
+  description?: string;
+  status?: string;
+  completed?: boolean;
+  completedAt?: Date;
+  priority?: number;
+  dueDate?: Date;
+}
+
+export async function PATCH(
+  req: Request,
+  { params }: { params: { taskId: string } }
+) {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -41,9 +53,11 @@ export async function PATCH(req: Request, { params }: { params: { taskId: string
     }
 
     const updateData = await req.json();
-    const { title, description, status, completed, priority, dueDate } = updateData;
+    const { title, description, status, completed, priority, dueDate } =
+      updateData;
 
-    const updateValues: any = {};
+    // Use the defined type instead of `any`
+    const updateValues: TaskUpdate = {};
 
     if (title !== undefined) updateValues.title = title;
     if (description !== undefined) updateValues.description = description;
@@ -78,7 +92,10 @@ export async function PATCH(req: Request, { params }: { params: { taskId: string
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { taskId: string } }) {
+export async function DELETE(
+  req: Request,
+  { params }: { params: { taskId: string } }
+) {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -113,11 +130,12 @@ export async function DELETE(req: Request, { params }: { params: { taskId: strin
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    await db
-      .delete(tasks)
-      .where(eq(tasks.id, parseInt(taskId)));
+    await db.delete(tasks).where(eq(tasks.id, parseInt(taskId)));
 
-    return NextResponse.json({ success: true, message: "Task deleted successfully" });
+    return NextResponse.json({
+      success: true,
+      message: "Task deleted successfully",
+    });
   } catch (error) {
     console.error("Error deleting task:", error);
     return NextResponse.json(
