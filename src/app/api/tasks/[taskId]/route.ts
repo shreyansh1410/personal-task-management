@@ -4,20 +4,7 @@ import { tasks } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { verifyToken } from "@/utils/auth";
 
-interface TaskUpdate {
-  title?: string;
-  description?: string;
-  status?: string;
-  completed?: boolean;
-  completedAt?: Date;
-  priority?: number;
-  dueDate?: Date;
-}
-
-export async function PATCH(
-  req: Request,
-  { params }: { params: { taskId: string } }
-) {
+export async function PATCH(req: Request, context: { params: { taskId: string } }) {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -29,7 +16,7 @@ export async function PATCH(
 
     const token = authHeader.split(" ")[1];
     const userId = await verifyToken(token);
-    const taskId = params.taskId;
+    const { taskId } = context.params;
 
     if (!taskId) {
       return NextResponse.json(
@@ -53,10 +40,18 @@ export async function PATCH(
     }
 
     const updateData = await req.json();
-    const { title, description, status, completed, priority, dueDate } =
-      updateData;
+    const { title, description, status, completed, priority, dueDate } = updateData;
 
-    // Use the defined type instead of `any`
+    interface TaskUpdate {
+      title?: string;
+      description?: string;
+      status?: string;
+      completed?: boolean;
+      completedAt?: Date;
+      priority?: number;
+      dueDate?: Date;
+    }
+
     const updateValues: TaskUpdate = {};
 
     if (title !== undefined) updateValues.title = title;
@@ -92,10 +87,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: { taskId: string } }
-) {
+export async function DELETE(req: Request, context: { params: { taskId: string } }) {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -107,7 +99,7 @@ export async function DELETE(
 
     const token = authHeader.split(" ")[1];
     const userId = await verifyToken(token);
-    const taskId = params.taskId;
+    const { taskId } = context.params;
 
     if (!taskId) {
       return NextResponse.json(
