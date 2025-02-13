@@ -3,8 +3,22 @@ import { db } from "@/db";
 import { tasks } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { verifyToken } from "@/utils/auth";
+import { NextRequest } from "next/server";
 
-export async function PATCH(req: Request, context: { params: { taskId: string } }) {
+interface TaskUpdate {
+  title?: string;
+  description?: string;
+  status?: string;
+  completed?: boolean;
+  completedAt?: Date;
+  priority?: number;
+  dueDate?: Date;
+}
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: {params: { taskId: string } }
+) {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -16,7 +30,7 @@ export async function PATCH(req: Request, context: { params: { taskId: string } 
 
     const token = authHeader.split(" ")[1];
     const userId = await verifyToken(token);
-    const { taskId } = context.params;
+    const taskId = (await params).taskId;
 
     if (!taskId) {
       return NextResponse.json(
@@ -40,17 +54,8 @@ export async function PATCH(req: Request, context: { params: { taskId: string } 
     }
 
     const updateData = await req.json();
-    const { title, description, status, completed, priority, dueDate } = updateData;
-
-    interface TaskUpdate {
-      title?: string;
-      description?: string;
-      status?: string;
-      completed?: boolean;
-      completedAt?: Date;
-      priority?: number;
-      dueDate?: Date;
-    }
+    const { title, description, status, completed, priority, dueDate } =
+      updateData;
 
     const updateValues: TaskUpdate = {};
 
@@ -87,7 +92,10 @@ export async function PATCH(req: Request, context: { params: { taskId: string } 
   }
 }
 
-export async function DELETE(req: Request, context: { params: { taskId: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { taskId: string } }
+) {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -99,8 +107,7 @@ export async function DELETE(req: Request, context: { params: { taskId: string }
 
     const token = authHeader.split(" ")[1];
     const userId = await verifyToken(token);
-    const { taskId } = context.params;
-
+    const taskId = (await params).taskId;
     if (!taskId) {
       return NextResponse.json(
         { error: "Task ID is required" },
