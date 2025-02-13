@@ -19,6 +19,9 @@ const TaskForm: React.FC = () => {
   const token = useAuthStore((state) => state.token);
   const queryClient = useQueryClient();
 
+  // Get current date in YYYY-MM-DD format for min date attribute
+  const today = new Date().toISOString().split('T')[0];
+
   const { mutate } = useMutation<Task, Error, CreateTaskDTO>({
     mutationFn: async (newTask: CreateTaskDTO) => {
       const response = await fetch("/api/tasks", {
@@ -82,6 +85,7 @@ const TaskForm: React.FC = () => {
         type="date"
         value={dueDate}
         onChange={(e) => setDueDate(e.target.value)}
+        min={today}
         className="text-black w-full p-2 mb-2 border rounded"
         required
       />

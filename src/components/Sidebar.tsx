@@ -15,8 +15,8 @@ const Sidebar = () => {
 
   const menuItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/dashboard/tasks", icon: CheckSquare, label: "Tasks" },
-    { href: "/dashboard/projects", icon: FolderKanban, label: "Projects" },
+    { href: "/tasks", icon: CheckSquare, label: "Tasks" },
+    { href: "/projects", icon: FolderKanban, label: "Projects" },
   ];
 
   return (

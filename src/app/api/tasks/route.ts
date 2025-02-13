@@ -1,3 +1,4 @@
+// app/api/tasks/route.ts
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { tasks } from "@/db/schema";
@@ -53,6 +54,8 @@ export async function POST(req: Request) {
         priority,
         dueDate: new Date(dueDate),
         userId,
+        status: "pending",
+        completed: false,
       })
       .returning();
 
