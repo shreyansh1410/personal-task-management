@@ -1,8 +1,7 @@
 "use client";
-
 import { useAuthStore } from "@/store/useStore";
 import { useRouter } from "next/navigation";
-import { UserCircle, LogOut } from "lucide-react";
+import { UserCircle, LogOut, Sun, Moon } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -11,6 +10,11 @@ export default function Header() {
   const user = useAuthStore((state) => state.user);
   const clearAuth = useAuthStore((state) => state.logout);
   const [scrolled, setScrolled] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">(
+    typeof window !== "undefined"
+      ? (localStorage.getItem("theme") as "light" | "dark") || "light"
+      : "light"
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,10 +24,23 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
   const handleLogout = () => {
     clearAuth();
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     router.push("/login");
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
   };
 
   return (
@@ -47,8 +64,18 @@ export default function Header() {
               </h1>
             </Link>
           </div>
-
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === "light" ? (
+                <Moon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+              ) : (
+                <Sun className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+              )}
+            </button>
             <div className="flex items-center space-x-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full py-2 px-4 transition-colors duration-200">
               <UserCircle className="h-5 w-5 text-gray-600 dark:text-gray-300" />
               {user && (

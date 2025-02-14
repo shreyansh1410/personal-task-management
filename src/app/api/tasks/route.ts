@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     const token = authHeader.split(" ")[1];
     const userId = await verifyToken(token);
 
-    const { title, description, priority, dueDate } = await req.json();
+    const { title, description, priority, dueDate, projectId } = await req.json();
     const newTask = await db
       .insert(tasks)
       .values({
@@ -56,6 +56,7 @@ export async function POST(req: Request) {
         userId,
         status: "pending",
         completed: false,
+        projectId: projectId || null, 
       })
       .returning();
 

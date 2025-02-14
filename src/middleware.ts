@@ -12,15 +12,9 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    // Create a TextEncoder
     const encoder = new TextEncoder()
-    
-    // Convert JWT_SECRET to Uint8Array
     const secret = encoder.encode(process.env.JWT_SECRET!)
-
-    // Verify the token
     await jose.jwtVerify(token, secret)
-    
     const response = NextResponse.next()
     return response
   } catch (error) {

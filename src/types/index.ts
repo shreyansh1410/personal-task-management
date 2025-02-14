@@ -1,6 +1,15 @@
 export type TaskPriority = 1 | 2 | 3;
 export type TaskStatus = "pending" | "in-progress" | "completed";
 
+export interface Project {
+  id: number;
+  name: string;
+  description: string;
+  userId: number;
+  createdAt: string;
+  taskCount?: number;
+}
+
 export interface Task {
   id: number;
   title: string;
@@ -13,6 +22,7 @@ export interface Task {
   updatedAt: string;
   completed: boolean;
   completedAt: string;
+  projectId?: number;
 }
 
 export interface User {
