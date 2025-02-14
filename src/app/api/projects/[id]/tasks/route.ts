@@ -3,7 +3,6 @@ import { verifyToken } from "@/utils/auth";
 import { db } from "@/db";
 import { projects, tasks } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-// import type { Task } from "@/types";
 
 export async function GET(
   req: NextRequest,

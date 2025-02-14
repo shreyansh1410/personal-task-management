@@ -137,13 +137,22 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const token = req.headers.get("authorization")?.split(" ")[1];
     const userId = await verifyToken(token);
 
-    const projectId = parseInt(params.id);
+    const { id } = await params;
+
+    if (!id || isNaN(parseInt(id))) {
+      return NextResponse.json(
+        { error: "Invalid project ID", success: false },
+        { status: 400 }
+      );
+    }
+
+    const projectId = parseInt(id);
     if (isNaN(projectId)) {
       return NextResponse.json(
         { error: "Invalid project ID", success: false },
